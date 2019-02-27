@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RR Web recording...</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js"></script>
+</head>
+<body>
+    
+    <script>
+
+        let eventObject = {};
+        let events = [];
+
+        rrwebRecord({
+        emit(event) {
+            // push event into the events array
+            events.push(event);
+        },
+        });
+
+        // this variable to set number of time to stop the setInterval
+        let setIntervalStopper = 0;
+
+        // this function will send events to the backend and reset the events array
+        function save() {
+            
+            // once the function called for a number of time stop it
+            if(++setIntervalStopper > 29){
+                // console.log("inside if");
+                clearInterval(interval);
+                // this localstorage key is assigning to get the even only once for a user for a new session
+                localStorage.setItem('eventSender', 'done');
+            }
+
+            eventObject = {user_id: 'riswan@tw.com', ['event' + setIntervalStopper]: events};
+
+            const body = JSON.stringify(eventObject);
+            events = [];
+            fetch('http://localhost:8102/api', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body
+            });
+        }
+
+        if(!localStorage.getItem('eventSender')){
+            // save events every 5 seconds  
+            var interval =  setInterval(save, 5 * 1000);   
+        }
+        
+    </script>
+</body>
+</html>
