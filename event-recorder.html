@@ -14,11 +14,17 @@
 
         let eventObject = {};
         let events = [];
+        let userName = 'msmr1986@gmail.com';
+        // let counter = 0;
 
         rrwebRecord({
         emit(event) {
             // push event into the events array
             events.push(event);
+            // eventObject[userName + counter++] = event;
+            // eventObject[userName] = event;
+            // console.log(event);
+            // console.log(eventObject);
         },
         });
 
@@ -27,33 +33,33 @@
 
         // this function will send events to the backend and reset the events array
         function save() {
-            
             // once the function called for a number of time stop it
-            if(++setIntervalStopper > 29){
+            if(++setIntervalStopper > 2){
                 // console.log("inside if");
                 clearInterval(interval);
                 // this localstorage key is assigning to get the even only once for a user for a new session
                 localStorage.setItem('eventSender', 'done');
             }
 
-            eventObject = {user_id: 'riswan@tw.com', ['event' + setIntervalStopper]: events};
+            // eventObject = {user_id: 'riswan@tw.com', ['event' + setIntervalStopper]: events};
+            eventObject[userName] = events;
 
             const body = JSON.stringify(eventObject);
+            // const body = JSON.parse(JSON.stringify(events));
             events = [];
             fetch('http://localhost:8102/api', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body
+                body,
             });
         }
 
         if(!localStorage.getItem('eventSender')){
             // save events every 5 seconds  
             var interval =  setInterval(save, 5 * 1000);   
-        }
-        
+        }        
     </script>
 </body>
 </html>
