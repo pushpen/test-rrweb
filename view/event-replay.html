@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RR Web recording...</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.js"></script>
+</head>
+<body>
+
+    <div id = "divTakeUser">
+        <label for="fname">User Name</label>
+        <input type="text" id="userName" name="username" placeholder="username for play record">
+        <button type="button" onclick="replayRecord(document.getElementById('userName').value)">Play</button>
+    </div>
+    
+    <script>
+        
+        let playerString = [];
+        let userId = 'msmr1986@gmail.com'
+
+        function replayRecord(userName){
+            document.getElementById('divTakeUser').style.display = "none";
+            userId = userName;
+            fetch('http://localhost:8102/read').then((data) => data.json()).then((data) => {
+                replayFormatSetter(data);
+            }).then(() => {
+                replay();
+            });
+        }
+
+        function replayFormatSetter(argument){
+            argument.forEach((entry) => {
+                console.log("replayFormatSetter function");
+                if(entry[userId] !== undefined){
+                    playerString = playerString.concat(entry[userId]);
+                }
+                    
+            });
+        }
+
+        function replay(){
+            console.log("replay function");
+            const playEvent = playerString;
+            const replayer = new rrweb.Replayer(playEvent);
+            replayer.play();
+        }
+                
+    </script>
+</body>
+</html>

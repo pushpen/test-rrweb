@@ -9,22 +9,36 @@
     <script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js"></script>
 </head>
 <body>
+
+    <label for="fname">Number of Events Needed</label>
+    <input type="text" id="fname" name="firstname" placeholder="Your name..">
     
     <script>
 
         let eventObject = {};
         let events = [];
+        let token = localStorage.getItem('token') ? localStorage.getItem('token') : '';
         let userName = 'msmr1986@gmail.com';
-        // let counter = 0;
+        var interval;
+
+        fetch('http://localhost:8102/user', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({token: token}),
+        }).then(res => res.json()).then(data => {
+            console.log(data[0].email);
+            userName = data[0].email;
+            if(!localStorage.getItem('eventSender')){
+                // save events every 4 seconds  
+                interval =  setInterval(save, 4 * 1000);   
+            } 
+        });
 
         rrwebRecord({
         emit(event) {
-            // push event into the events array
             events.push(event);
-            // eventObject[userName + counter++] = event;
-            // eventObject[userName] = event;
-            // console.log(event);
-            // console.log(eventObject);
         },
         });
 
@@ -34,8 +48,8 @@
         // this function will send events to the backend and reset the events array
         function save() {
             // once the function called for a number of time stop it
-            if(++setIntervalStopper > 2){
-                // console.log("inside if");
+            if(++setIntervalStopper == 5){
+                console.log(setIntervalStopper);
                 clearInterval(interval);
                 // this localstorage key is assigning to get the even only once for a user for a new session
                 localStorage.setItem('eventSender', 'done');
@@ -54,12 +68,7 @@
                 },
                 body,
             });
-        }
-
-        if(!localStorage.getItem('eventSender')){
-            // save events every 5 seconds  
-            var interval =  setInterval(save, 5 * 1000);   
-        }        
+        }       
     </script>
 </body>
 </html>
