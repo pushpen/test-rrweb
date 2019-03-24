@@ -20,15 +20,25 @@
         
         let playerString = [];
         let userId = 'msmr1986@gmail.com'
+        let fileName = 'events';
 
         function replayRecord(userName){
             document.getElementById('divTakeUser').style.display = "none";
             userId = userName;
-            fetch('http://localhost:8102/read').then((data) => data.json()).then((data) => {
+            let arrUserId = userId.split('@');
+            fileName = arrUserId[0];
+            fetch('http://localhost:8102/read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({fileName: fileName}),
+
+            }).then((data) => data.json()).then((data) => {
                 replayFormatSetter(data);
             }).then(() => {
                 replay();
-            });
+            }).catch(error => console.log('no recording for the user') );
         }
 
         function replayFormatSetter(argument){
@@ -43,9 +53,16 @@
 
         function replay(){
             console.log("replay function");
-            const playEvent = playerString;
-            const replayer = new rrweb.Replayer(playEvent);
+            const replayer = new rrweb.Replayer(playerString);
             replayer.play();
+            // the below code is to make new file eventevents.json which can use in rrwebplayer
+            fetch('http://localhost:8102/recordevent', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({playerString: playerString}),
+            });
         }
                 
     </script>

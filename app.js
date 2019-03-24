@@ -14,6 +14,8 @@ var connection = mysql.createConnection({
     database : 'tutorwizard_work'
   });
 
+let fileName = 'events';
+
 app.use(cors());
 
 app.use(bodyParser.json({limit: '50mb', extended: true}));
@@ -33,21 +35,49 @@ app.get('/replay', (req, res, next) => {
     res.sendFile(__dirname + '/view/event-replay.html');
 });
 
-app.get('/read', (req, res, next) => {
-    fs.readFile('./events.json', (err, data) => {
-        if(err)
-        throw err;
-        readData = data;
-        res.send(readData);
+// app.get('/read', (req, res, next) => {
+//     fs.readFile('./events.json', (err, data) => {
+//         if(err)
+//         throw err;
+//         readData = data;
+//         res.send(readData);
+//     });
+// });
+
+app.post('/read', (req, res, next) => {
+    fs.readFile('./' + req.body.fileName + '.json', (err, data) => {
+        if(err){
+            res.status(400).send('error on reading');
+        }else{
+            readData = data;
+            res.send(readData);
+        }
+        
     });
 });
 
 app.post('/api', (req, res) => {
-    fs.appendFile('events.json', JSON.stringify(req.body) + ',', (err) => {
-        if(err) throw err;
-        console.log('events updated');
+    fs.appendFile(fileName + '.json', JSON.stringify(req.body) + ',', (err) => {
+        if(err){
+            console.log(err);
+            res.status(400).send('error on recording');
+        }else{
+            console.log('events updated');
+            res.send("event received");
+        }  
     })
-    res.send("event received");
+});
+
+app.post('/recordevent', (req, res) => {
+    fs.appendFile('event' + fileName + '.json', JSON.stringify(req.body.playerString), (err) => {
+        if(err){
+            console.log(err);
+            res.status(400).send('error on recording');
+        }else{
+            console.log('events updated');
+            res.send("event received");
+        }  
+    })
 });
 
 app.post('/user', (req, res) => {
@@ -57,13 +87,22 @@ app.post('/user', (req, res) => {
                 res.status(400).send('mysql error');
                 console.log(error);
             } else{
-                connection.query(`SELECT email from users WHERE id = ?`, userIds[0].user_id, (error, email) => {
+                if(userIds[0] !== undefined){
+                    connection.query(`SELECT email from users WHERE id = ?`, userIds[0].user_id, (error, email) => {
                         if(error){
                             res.status(400).send('mysql error');
                             console.log(error);
                         }
                         res.send(email);
-                });
+                        // giving email first part as filename
+                        let arrFileName = email[0].email.split('@');
+                        fileName = arrFileName[0];
+                    });
+                }else{
+                    res.status(400).send('no user with the token');
+                    console.log(error);
+                }
+                
             }
         });
     }else{
