@@ -62,4 +62,5 @@ typings/
 
 # ignore recordings
 recordings/
+recordings_server/
 events.json

@@ -35,17 +35,8 @@ app.get('/replay', (req, res, next) => {
     res.sendFile(__dirname + '/view/event-replay.html');
 });
 
-// app.get('/read', (req, res, next) => {
-//     fs.readFile('./events.json', (err, data) => {
-//         if(err)
-//         throw err;
-//         readData = data;
-//         res.send(readData);
-//     });
-// });
-
 app.post('/read', (req, res, next) => {
-    fs.readFile('./' + req.body.fileName + '.json', (err, data) => {
+    fs.readFile('recordings/' + req.body.fileName + '.json', (err, data) => {
         if(err){
             res.status(400).send('error on reading');
         }else{
@@ -57,7 +48,7 @@ app.post('/read', (req, res, next) => {
 });
 
 app.post('/api', (req, res) => {
-    fs.appendFile(fileName + '.json', JSON.stringify(req.body) + ',', (err) => {
+    fs.appendFile('recordings/' + fileName + '.json', JSON.stringify(req.body) + ',', (err) => {
         if(err){
             console.log(err);
             res.status(400).send('error on recording');
@@ -69,7 +60,7 @@ app.post('/api', (req, res) => {
 });
 
 app.post('/recordevent', (req, res) => {
-    fs.appendFile('event' + fileName + '.json', JSON.stringify(req.body.playerString), (err) => {
+    fs.appendFile('recordings/' + 'event' + fileName + '.json', JSON.stringify(req.body.playerString), (err) => {
         if(err){
             console.log(err);
             res.status(400).send('error on recording');
