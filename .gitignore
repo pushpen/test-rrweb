@@ -64,3 +64,4 @@ typings/
 recordings/
 recordings_server/
 events.json
+sftp.json
