@@ -6,7 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>RR Web recording...</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js"></script>
 </head>
 <body>
 
@@ -15,10 +17,8 @@
         <input type="text" id="userName" name="username" placeholder="username for play record">
         <button type="button" onclick="replayRecord(document.getElementById('userName').value)">Play</button>
     </div>
-    
     <script>
         
-        let playerString = [];
         let userId = 'msmr1986@gmail.com'
         let fileName = 'events';
 
@@ -32,37 +32,34 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({fileName: fileName}),
-
+                body: JSON.stringify({fileName: fileName})
             }).then((data) => data.json()).then((data) => {
-                replayFormatSetter(data);
-            }).then(() => {
-                replay();
-            }).catch(error => console.log('no recording for the user') );
+                return replayFormatSetter(data);
+            }).then((playerData) => {
+                replay(playerData);
+            }).catch(error => console.log(error) );
         }
 
         function replayFormatSetter(argument){
+            let playerString = [];
             argument.forEach((entry) => {
                 console.log("replayFormatSetter function");
                 if(entry[userId] !== undefined){
                     playerString = playerString.concat(entry[userId]);
                 }
-                    
-            });
+            });  
+            return  playerString;
         }
 
-        function replay(){
-            console.log("replay function");
-            const replayer = new rrweb.Replayer(playerString);
-            replayer.play();
-            // the below code is to make new file eventevents.json which can use in rrwebplayer
-            fetch('http://localhost:8102/recordevent', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
+        // in the replay function the data property should named events
+        function replay(events){ 
+            const component = new rrwebPlayer({
+                target: document.body,
+                data: {
+                    events,
                 },
-                body: JSON.stringify({playerString: playerString}),
             });
+            component.addEventListener('finish', () => console.log('finish'));
         }
                 
     </script>

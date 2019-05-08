@@ -24,7 +24,8 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "rrweb-player": "^0.3.11"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"
